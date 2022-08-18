@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+		<style>
+		#__benchmarkJS__DOM {
+			height: 0;
+			width: 0;
+			overflow: hidden;
+		}
+		#__benchmarkJS__controls {
+			margin: 0 auto;
+			width: 380px;
+		}
+		#__benchmarkJS__controls textarea {
+			height: 100px;
+			width: 350px;
+		}
+		#__benchmarkJS__results {
+			margin: 0 auto;
+			width: 380px;
+		}
+		</style>
+		<title>JavaScript Benchmark</title>
+	</head>
+	<body>
+		<div id="__benchmarkJS__DOM"></div>
+		<div id="__benchmarkJS__controls">
+			<fieldset>
+				<legend>JavaScript #1</legend>
+				<textarea id="__benchmarkJS__codeA" placeholder="const prcd = document.querySelector('pre.code');"></textarea>
+			</fieldset>
+			<fieldset>
+				<legend>JavaScript #2</legend>
+				<textarea id="__benchmarkJS__codeB" placeholder="const cd = document.getElementsByTagName('code');const prcd = [];for(const x of cd){if('PRE' == x.parentNode.nodeName)prcd.push(x);}"></textarea>
+			</fieldset>
+			<fieldset>
+				<legend>HTML DOM (optional)</legend>
+				<textarea id="__benchmarkJS__htmlDOM" placeholder="<div><span><pre><code>alert('hi!');</code></pre></span></div>"></textarea>
+			</fieldset>
+			<fieldset>
+				<legend>Iterations count</legend>
+				<input type="text" id="__benchmarkJS__iterations">
+			</fieldset>
+			<button type="button" role="button" id="__benchmarkJS__launch">Launch</button>
+		</div>
+		<div id="__benchmarkJS__results">
+			<p>Code #1 execution time: <span id="__benchmarkJS__codeAtime">TBC</span></p>
+			<p>Code #2 execution time: <span id="__benchmarkJS__codeBtime">TBC</span></p>
+		</div>
+		<script>
+			window.onload = () => {
+				// make sure there will be no collisions in global namespace!
+				const __benchmarkJS__numIterations = 10000;
+				const __benchmarkJS__inputIterations = document.getElementById('__benchmarkJS__iterations');
+				const __benchmarkJS__divDOM = document.getElementById('__benchmarkJS__DOM');
+				const __benchmarkJS__inputCodeA = document.getElementById('__benchmarkJS__codeA');
+				const __benchmarkJS__inputCodeB = document.getElementById('__benchmarkJS__codeB');
+				const __benchmarkJS__inputDOM = document.getElementById('__benchmarkJS__htmlDOM');
+				const __benchmarkJS__statsTimeA = document.getElementById('__benchmarkJS__codeAtime');
+				const __benchmarkJS__statsTimeB = document.getElementById('__benchmarkJS__codeBtime');
+				//
+				__benchmarkJS__inputIterations.value = __benchmarkJS__numIterations;
+				//
+				document.getElementById('__benchmarkJS__launch').onclick = e => {
+					if(!__benchmarkJS__inputIterations.value.length || 0 >= parseInt(__benchmarkJS__inputIterations.value)){
+						alert('Please set iterations count to positive integer value!');
+						return;
+					}
+					const __benchmarkJS__codes = [__benchmarkJS__inputCodeA.value,__benchmarkJS__inputCodeB.value];
+					const __benchmarkJS__times = [-1,-1];
+					const __benchmarkJS__DOMhtml = __benchmarkJS__inputDOM.value;
+					if(__benchmarkJS__codes[0].length && __benchmarkJS__codes[1].length){
+						for(__benchmarkJS__variant in __benchmarkJS__codes){
+							console.warn('Variant #'+__benchmarkJS__variant);
+							const __benchmarkJS__code = __benchmarkJS__codes[__benchmarkJS__variant];
+							const __benchmarkJS__timeStart = Date.now();
+							for(let __benchmarkJS__c=0;__benchmarkJS__c<parseInt(__benchmarkJS__inputIterations.value);__benchmarkJS__c++){
+								if(__benchmarkJS__DOMhtml)
+									__benchmarkJS__divDOM.innerHTML = __benchmarkJS__DOMhtml;
+								eval(__benchmarkJS__code);
+							}
+							__benchmarkJS__times[__benchmarkJS__variant] = Date.now()-__benchmarkJS__timeStart;
+							console.warn('Variant #'+__benchmarkJS__variant+' ended, result='+__benchmarkJS__times[__benchmarkJS__variant]);
+						}
+						__benchmarkJS__divDOM.innerHTML = '';
+						//statsIteration.innerHTML = 'done';
+						if(__benchmarkJS__times[1] > __benchmarkJS__times[0]/* && __benchmarkJS__times[0] > 0*/){
+							diffPrc = 100-(__benchmarkJS__times[0]/(__benchmarkJS__times[1]/100));
+							__benchmarkJS__statsTimeA.innerHTML = __benchmarkJS__times[0]+' <b>('+diffPrc+'% faster)</b>';
+							__benchmarkJS__statsTimeB.innerHTML = __benchmarkJS__times[1];
+						} else {
+							diffPrc = 100-(__benchmarkJS__times[1]/(__benchmarkJS__times[0]/100));
+							__benchmarkJS__statsTimeA.innerHTML = __benchmarkJS__times[0];
+							__benchmarkJS__statsTimeB.innerHTML = __benchmarkJS__times[1]+' <b>('+diffPrc+'% faster)</b>';
+						}
+					} else alert('Please fill both code boxes!');
+				};
+			};
+		</script>
+	</body>
+</html>
